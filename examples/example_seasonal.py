@@ -77,7 +77,7 @@ if __name__ == "__main__":
 #     # Cholesky
 # =============================================================================
 
-    model = estimator(num_paths=2, seed=9)
+    model = estimator(num_paths=2, seed=123)
     # Create matrix for illustration purposes
     matrix = np.array([[1, .8], [.8, 1]])
     print(matrix)

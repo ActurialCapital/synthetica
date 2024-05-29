@@ -49,6 +49,7 @@ class BaseSynthetic(ABC):
         self._num_paths = num_paths
         if seed is not None:
             np.random.seed(seed)
+            
         # White noise params
         self._mean = mean
         self._delta = delta

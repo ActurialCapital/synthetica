@@ -24,17 +24,10 @@ class BaseSynthetic(ABC):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic processes. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     freq : str, optional
         The frequency of the data. Default is 'D'.
     seed : int, optional
         The random seed for reproducibility. Default is None.
-
-    Methods
-    -------
-    to_pandas(output): Convert synthetic output to a pandas DataFrame or 
-    Series.
 
     """
 
@@ -46,7 +39,6 @@ class BaseSynthetic(ABC):
         delta: float = 1/252,
         sigma: float = 0.125,
         tau: float = 0.2,
-        matrix: pd.DataFrame = None,
         freq: str = 'D',
         seed: int = None
     ):
@@ -60,8 +52,6 @@ class BaseSynthetic(ABC):
         self._mean = mean
         self._delta = delta
         self._sigma = sigma
-        # Cholesky
-        self._matrix = matrix
 
     def __repr__(self):
         return f'{self.__class__.__name__}'
@@ -88,12 +78,8 @@ class BaseSynthetic(ABC):
     def num_paths(self) -> int:
         return self._num_paths
 
-    @property
-    def matrix(self) -> np.ndarray | pd.DataFrame:
-        return self._matrix
-
     @abstractmethod
-    def transform(self, *args, **kwargs) -> pd.DataFrame:
+    def transform(self, *args, **kwargs) -> pd.Series | pd.DataFrame:
         pass
 
     @cached_property
@@ -120,31 +106,37 @@ class BaseSynthetic(ABC):
 
     @property
     def mean(self) -> float:
+        """Mean value"""
         return self._mean
 
     @mean.setter
     @sth.callback('white_noise')
     def mean(self, value) -> float:
+        """Mean value update"""
         if value != self._mean:
             self._mean = value
 
     @property
     def delta(self) -> float:
+        """Delta value"""
         return self._delta
 
     @delta.setter
     @sth.callback('white_noise')
     def delta(self, value) -> float:
+        """Delta value update"""
         if value != self._delta:
             self._delta = value
 
     @property
     def sigma(self) -> float:
+        """Sigma value"""
         return self._sigma
 
     @sigma.setter
     @sth.callback('white_noise')
     def sigma(self, value) -> float:
+        """Sigma value update"""
         if value != self._sigma:
             self._sigma = value
 
@@ -190,77 +182,62 @@ class BaseSynthetic(ABC):
 
     # #### Cholesky #### #
 
-    def create_corr_paths(
-        self,
-        cov,
-        length: int = 252,
-        num_paths: int = 1,
-        delta: float = 1/252,
-        sigma: float = 0.125
-    ) -> np.ndarray:
+    def create_corr_returns(self, matrix) -> pd.Series | pd.DataFrame:
         """
         This method can construct a basket of correlated asset paths using the 
         Cholesky decomposition method.
 
-        Parameters:
+        Parameters
         ----------
-        cov : np.ndarray
-            The covariance matrix of asset returns.
-        length : int, optional
-            The length of the time series. Default is 252.
-        num_paths : int, optional
-            The number of paths to generate. Default is 1.
-        delta : float, optional
-            The time step size (e.g., 1/252 for daily data). Default is 1/252.
-        sigma : float, optional
-            The volatility of the stochastic processes. Default is 0.125.
+        matrix : pd.DataFrame or np.array
+            The matrix applied in Cholesky decomposition.
 
-        Returns:
-        ----------
-        list of list
-            A list of lists representing correlated log returns.
+        Returns
+        -------
+        pd.Series or pd.DataFrame:
+            Data representing correlated log returns.
         """
         try:
-            decomposition = np.linalg.cholesky(cov)
+            decomposition = np.linalg.cholesky(matrix)
 
         except:
-            cov_positive_definite = sth.nearest_positive_definite(cov)
-            decomposition = np.linalg.cholesky(cov_positive_definite)
+            updated_matrix = sth.nearest_positive_definite(matrix)
+            decomposition = np.linalg.cholesky(updated_matrix)
 
-        sqrt_delta_sigma = np.sqrt(delta) * sigma
+        sqrt_delta_sigma = np.sqrt(self.delta) * self.sigma
 
         # Construct uncorrelated paths to convert into correlated paths
         uncorrelated_paths = [
             np.array(
                 # Uncorrelated random numbers
                 [np.random.normal(0, sqrt_delta_sigma)
-                 for _ in range(num_paths)]
+                 for _ in range(self.num_paths)]
             )
-            for _ in range(length)
+            for _ in range(self.length + 1)
         ]
 
         uncorrelated_matrix = np.matrix(uncorrelated_paths)
         correlated_matrix = uncorrelated_matrix * decomposition
-        extracted_paths = [[] for _ in range(1, num_paths + 1)]
-        for j in range(0, len(correlated_matrix) * num_paths - num_paths, num_paths):
-            for i in range(num_paths):
+        extracted_paths = [[] for _ in range(1, self.num_paths + 1)]
+        for j in range(0, len(correlated_matrix) * self.num_paths - self.num_paths, self.num_paths):
+            for i in range(self.num_paths):
                 extracted_paths[i].append(correlated_matrix.item(j + i))
 
-        return extracted_paths
+        return self.to_pandas(np.array(extracted_paths).T)
 
     def cholesky_transform(self, rvs: np.array, matrix: np.array) -> np.ndarray:
         """
         Perform Cholesky transformation on random variables.
 
-        Parameters:
+        Parameters
         ----------
         rvs : np.array
             Random variables to transform.
         matrix : np.array
             The matrix for Cholesky decomposition.
 
-        Returns:
-        ----------
+        Returns
+        -------
         np.ndarray
             Transformed random variables.
         """
@@ -282,13 +259,13 @@ class BaseSynthetic(ABC):
         """
         This method exponentiates a sequence of log-returns to returns.
 
-        Parameters:
+        Parameters
         ----------
         log_returns : Iterable
             An iterable containing log returns.
 
-        Returns:
-        ----------
+        Returns
+        -------
         np.ndarray
             An array of returns.
         """
@@ -304,15 +281,15 @@ class BaseSynthetic(ABC):
        (exponentiation) and then computes a price sequence given a starting 
        price, start_value.
 
-       Parameters:
+       Parameters
        ----------
        log_returns : Iterable
            An iterable containing log returns.
        start_value : float, optional
            The starting value of the price sequence. Default is 100.0.
 
-       Returns:
-       ----------
+       Returns
+       -------
        np.ndarray
            An array of price sequences.
        """
@@ -327,13 +304,13 @@ class BaseSynthetic(ABC):
         """
         Convert synthetic output to a pandas DataFrame or Series.
 
-        Parameters:
+        Parameters
         ----------
         output : np.ndarray
             The synthetic output to convert.
 
-        Returns:
-        ----------
+        Returns
+        -------
         pd.DataFrame or pd.Series
             A pandas DataFrame or Series containing the converted data.
         """

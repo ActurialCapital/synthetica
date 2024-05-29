@@ -75,22 +75,26 @@ if __name__ == "__main__":
 #     # Cholesky
 # =============================================================================
 
-    seed = 9
-    num_paths = 2
-
+    model = estimator(num_paths=2, seed=9)
     # Create matrix for illustration purposes
-    model = estimator(num_paths=num_paths, seed=seed)
-    df1 = np.cumprod(1 + model.transform())
+    matrix = np.array([[1, .8], [.8, 1]])
+    print(matrix)
+    # ...
+
+    # Without correlation
+
+    df1 = model.transform()
     print(df1)
-    df1.plot()
+    # ...
+    np.cumprod(1 + df1).plot()
     # --matplotlib plt--
-
-    # # With correlated variables
-    model = estimator(num_paths=num_paths, matrix=df1.cov(), seed=seed)
-    df2 = np.cumprod(1 + model.transform())
-    print(df2)
-    df2.plot()
-    # --matplotlib plt--
-
     print(df1.corr())
+
+    # With correlation
+
+    df2 = model.transform(matrix)
+    print(df2)
+    # ...
+    np.cumprod(1 + df2).plot()
+    # --matplotlib plt--
     print(df2.corr())

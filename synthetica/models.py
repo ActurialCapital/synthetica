@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import levy_stable, norm
 
-from synthetica  import BaseSynthetic
+from synthetica import BaseSynthetic
 
 
 class GeometricBrownianMotion(BaseSynthetic):
@@ -25,8 +25,6 @@ class GeometricBrownianMotion(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic process. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     mu : float, optional
         The expected return rate (drift) for the GBM. Default is 0.058.
     freq : str, optional
@@ -41,7 +39,7 @@ class GeometricBrownianMotion(BaseSynthetic):
     process underlying the Black Scholes options pricing formula.
 
     Example
-    --------
+    -------
     >>> gbm_model = GeometricBrownianMotion(
     ...     length=252, 
     ...     num_paths=1, 
@@ -59,7 +57,6 @@ class GeometricBrownianMotion(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         mu: float = 0.058,
         freq: str = 'D',
         seed: int = None
@@ -70,30 +67,36 @@ class GeometricBrownianMotion(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
         self.mu = mu
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic Geometric Brownian Motion (GBM) data.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic GBM data.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic GBM data.
         """
         sigma_pow_mu_delta = (
             self.mu - 0.5 * np.power(self.sigma, 2.0)
         ) * self.delta
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise, self.matrix)
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
-        paths = np.array(self.white_noise) + sigma_pow_mu_delta
+        paths = np.array(noise) + sigma_pow_mu_delta
         prices = self.to_prices(paths)
 
         return self.to_pandas(prices)
@@ -141,10 +144,6 @@ class Heston(BaseSynthetic):
     seed : int, optional
         The random seed for reproducibility. Default is None.
 
-    Methods:
-    ----------
-    transform() -> pd.DataFrame: Generate synthetic Heston model data.
-
     Example
     -------
     >>> heston_model = Heston(
@@ -169,7 +168,6 @@ class Heston(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         start_value: float = 100.0,
         rho: float = 0.7,
         vol0: float = 0.25**2,
@@ -186,7 +184,6 @@ class Heston(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -198,14 +195,19 @@ class Heston(BaseSynthetic):
         self.theta = theta
         self.nu = nu
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic Heston model data.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic Heston model data.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic Heston model data.
         """
         bm_volatility = np.random.multivariate_normal(
             mean=np.array([0, 0]),
@@ -213,8 +215,8 @@ class Heston(BaseSynthetic):
             size=(self.length, self.num_paths)
         )
 
-        if self.matrix is not None:
-            bm_volatility = self.cholesky_transform(bm_volatility, self.matrix)
+        if matrix is not None:
+            bm_volatility = self.cholesky_transform(bm_volatility, matrix)
 
         # arrays for storing prices and variances
         prices = np.full(
@@ -270,8 +272,6 @@ class Merton(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic process. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     lmbda : float, optional
         The jump intensity parameter. Default is 0.00025.
     var : float, optional
@@ -282,10 +282,6 @@ class Merton(BaseSynthetic):
         The frequency of the data. Default is 'D'.
     seed : int, optional
         The random seed for reproducibility. Default is None.
-
-    Methods:
-    ----------
-    transform() -> pd.DataFrame: Generate synthetic Merton model data.
 
     Note
     ------
@@ -314,7 +310,6 @@ class Merton(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         lmbda: float = 0.00025,
         var: float = 0.001,
         mu: float = 0.2,
@@ -327,7 +322,6 @@ class Merton(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -335,14 +329,19 @@ class Merton(BaseSynthetic):
         self.var = var
         self.mu = mu
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic Merton model data.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic Merton model data.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic Merton model data.
         """
         small_lmbda = - (1.0 / self.lmbda)
         jump = np.zeros((self.length, self.num_paths), dtype=np.float64)
@@ -361,11 +360,13 @@ class Merton(BaseSynthetic):
 
                 time += 1
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise, self.matrix)
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
-        paths = np.add(jump, self.white_noise)
+        paths = np.add(jump, noise)
         prices = self.to_prices(paths)
 
         return self.to_pandas(prices)
@@ -391,8 +392,6 @@ class Poisson(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the GBM component. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     lmbda : float, optional
         The jump intensity parameter. Default is 0.00025.
     var : float, optional
@@ -404,13 +403,8 @@ class Poisson(BaseSynthetic):
     seed : int, optional
         The random seed for reproducibility. Default is None.
 
-    Methods:
-    ----------
-    transform() -> pd.DataFrame: 
-        Generate synthetic data using the Jump Process model.
-
     Note
-    ------
+    ----
     This method produces a sequence of jump sizes which represent a jump 
     diffusion process. These jumps are combined with a geometric brownian 
     motion (log returns). This model is an alternative to the Merton model.
@@ -436,7 +430,6 @@ class Poisson(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         lmbda: float = 0.00025,
         var: float = 0.001,
         mu: float = 0.2,
@@ -449,7 +442,6 @@ class Poisson(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -477,7 +469,7 @@ class Poisson(BaseSynthetic):
             Lambda parameter for Poisson distribution.
 
         Returns
-        ---------
+        -------
         int
             Inverse Poisson random variable.
         """
@@ -492,15 +484,19 @@ class Poisson(BaseSynthetic):
 
         return k
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic data using the Poisson model.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic data following the poisson 
-            process model.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic data following the poisson process model.
         """
         jump = np.zeros((self.length, self.num_paths))
         for path in range(self.num_paths):
@@ -514,11 +510,13 @@ class Poisson(BaseSynthetic):
                             scale=self.var
                         )
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise, self.matrix)
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
-        paths = np.add(jump, self.white_noise)
+        paths = np.add(jump, noise)
         prices = self.to_prices(paths)
 
         return self.to_pandas(prices)
@@ -544,8 +542,6 @@ class LevyStable(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The scale parameter of the Levy Stable distribution. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     alpha : float, optional
         The alpha parameter of the Levy Stable distribution. Should be in the 
         range (0, 2].
@@ -559,13 +555,8 @@ class LevyStable(BaseSynthetic):
     seed : int, optional
         The random seed for reproducibility. Default is None.
 
-    Methods:
-    ----------
-    transform() -> pd.DataFrame: Generate synthetic data using the Levy Stable 
-    Process model.
-
     Note
-    ------
+    ----
     This method returns a Levy stable process. levy_stable generalizes 
     several distributions: 0 < alpha <= 2 and -1 <= beta <= 1, such as:
 
@@ -596,7 +587,6 @@ class LevyStable(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         alpha: float = 1.68,
         beta: float = 0.01,
         freq: str = 'D',
@@ -608,22 +598,25 @@ class LevyStable(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
         self.alpha = alpha
         self.beta = beta
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic data using the Levy Stable Process model.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic data following the Levy 
-            Stable Process model.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic data following the Levy Stable Process model.
         """
         paths = levy_stable.rvs(
             self.alpha,
@@ -633,8 +626,8 @@ class LevyStable(BaseSynthetic):
             size=(self.length, self.num_paths)
         )
 
-        if self.matrix is not None:
-            paths = self.cholesky_transform(paths, self.matrix)
+        if matrix is not None:
+            paths = self.cholesky_transform(paths, matrix)
 
         prices = self.to_prices(paths)
 
@@ -664,8 +657,6 @@ class CIR(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic processes. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     start_value : float, optional
         The starting value. Default is 0.5.
     kappa : float, optional
@@ -677,12 +668,8 @@ class CIR(BaseSynthetic):
     seed : int, optional
         The random seed for reproducibility. Default is None.
 
-    Methods:
-    --------
-    transform() -> pd.DataFrame: Generate synthetic interest rate data.
-
     Note
-    ------
+    ----
     This method returns the rate levels of a mean-reverting cox ingersoll 
     ross process. It is used to model interest rates as well as stochastic 
     volatility in the Heston model. Because the returns between the 
@@ -712,7 +699,6 @@ class CIR(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         start_value: float = 0.5,
         kappa: float = 6.0,
         mu: float = 0.5,
@@ -725,7 +711,6 @@ class CIR(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -733,7 +718,7 @@ class CIR(BaseSynthetic):
         self.kappa = kappa
         self.mu = mu
 
-    def transform(self) -> pd.DataFrame:
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic interest rate data using the Cox-Ingersoll-Ross 
         (CIR) model.
@@ -745,27 +730,32 @@ class CIR(BaseSynthetic):
         the previous level i.e. the process has level dependent interest
         rates.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic interest rate data.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic interest rate data.
         """
         paths = np.full((self.length+1, self.num_paths), self.start_value)
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise,
-                self.matrix
-            )
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
         for length in range(1, self.length + 1):
             drift = (
                 self.kappa * (self.mu - paths[length-1]) * self.delta
             )
-            noise = (
-                np.sqrt(paths[length-1]) * self.white_noise[length-1]
+            deviation = (
+                np.sqrt(paths[length-1]) * noise[length-1]
             )
-            paths[length] = paths[length-1] + drift + noise
+            paths[length] = paths[length-1] + drift + deviation
 
         return self.to_pandas(paths[1:,])
 
@@ -793,8 +783,6 @@ class MeanReverting(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic processes. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     start_value : float, optional
         The starting value. Default is 0.5.
     kappa : float, optional
@@ -829,7 +817,6 @@ class MeanReverting(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         start_value: float = 0.5,
         kappa: float = 6.0,
         mu: float = 0.5,
@@ -842,7 +829,6 @@ class MeanReverting(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -850,31 +836,38 @@ class MeanReverting(BaseSynthetic):
         self.kappa = kappa
         self.mu = mu
 
-    def transform(self) -> pd.DataFrame:
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic mean-reverting data using the Ornstein-Uhlenbeck
         model.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
-        ---------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic mean-reverting data.
+        -------
+        pd.Series | pd.DataFrame
+            Data containing synthetic mean-reverting data.
         """
         paths = np.full(
             (self.length+1, self.num_paths), self.start_value, dtype=np.float64
         )
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise, self.matrix)
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
         for length in range(1, self.length + 1):
             drift = (
                 self.kappa * (self.mu - paths[length-1]) * self.delta
             )
-            noise = self.white_noise[length - 1]
+            deviation = noise[length - 1]
 
-            paths[length] = paths[length-1] + drift + noise
+            paths[length] = paths[length-1] + drift + deviation
 
         return self.to_pandas(paths[1:,])
 
@@ -898,8 +891,6 @@ class AR(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the stochastic processes. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     start_value : float, optional
         The starting value. Default is 0.5.
     ar : list of float, optional
@@ -920,7 +911,6 @@ class AR(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         ar=None,
         freq: str = 'D',
         seed: int = None
@@ -931,37 +921,39 @@ class AR(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
         self.ar = ar or [0.8]
         self.order = len(self.ar)
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic autoregressive (AR) data.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
 
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame containing synthetic autoregressive (AR) data.
+        pd.Series | pd.DataFrame
+            Data containing synthetic autoregressive (AR) data.
 
         """
         paths = np.zeros((self.length+1, self.num_paths), dtype=np.float64)
 
-        if self.matrix is not None:
-            self.white_noise = self.cholesky_transform(
-                self.white_noise,
-                self.matrix
-            )
+        noise = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
 
         for length in range(1, self.length + 1):
-            noise = self.white_noise[length - 1]
+            deviation = noise[length - 1]
             paths[length] = (
-                sum([self.ar[j] * paths[length - j - 1] for j in range(self.order)]) +
-                noise
+                sum([self.ar[j] * paths[length - j - 1] for j in range(self.order)]) + deviation
             )
 
         return self.to_pandas(paths[1:,])
@@ -992,8 +984,6 @@ class NARMA(BaseSynthetic):
         The number of paths to generate. Default is 1.
     start_value : float, optional
         The starting value. Default is 0.5.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     n : int, optional
         The order of the NARMA process. Default is 10.
     a : list, optional
@@ -1010,7 +1000,6 @@ class NARMA(BaseSynthetic):
         length: int | pd.DatetimeIndex = 252,
         num_paths: int = 1,
         start_value: float = 0.5,
-        matrix: pd.DataFrame | np.ndarray = None,
         n: int = 10,
         a: list | None = None,
         freq: str = 'D',
@@ -1019,7 +1008,6 @@ class NARMA(BaseSynthetic):
         super().__init__(
             length=length,
             num_paths=num_paths,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
@@ -1033,17 +1021,20 @@ class NARMA(BaseSynthetic):
                 f"{len(self.a)}."
             )
 
-    def transform(self):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic Non-linear Autoregressive Moving Average (NARMA) 
         data.
 
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
+
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame containing non-linear Autoregressive Moving 
-            Average (NARMA) data.
-
+        pd.Series | pd.DataFrame
+            Data containing non-linear Autoregressive Moving Average (NARMA) data.
         """
         paths = np.full(
             (self.length+1, self.num_paths),
@@ -1052,8 +1043,8 @@ class NARMA(BaseSynthetic):
         )
         # Uniform data
         u = np.random.uniform(
-            low=0, 
-            high=0.5, 
+            low=0,
+            high=0.5,
             size=(self.length + 1, self.num_paths)
         )
 
@@ -1065,8 +1056,8 @@ class NARMA(BaseSynthetic):
                 self.a[3]
             )
 
-        if self.matrix is not None:
-            paths = self.cholesky_transform(paths, self.matrix)
+        if matrix is not None:
+            paths = self.cholesky_transform(paths, matrix)
 
         return self.to_pandas(paths[1:,])
 
@@ -1097,8 +1088,6 @@ class Seasonal(BaseSynthetic):
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
         The volatility of the amplitude process. Default is 0.125.
-    matrix : pd.DataFrame or np.array, optional
-        The matrix applied in Cholesky decomposition (optional).
     omega : float, optional
         How often the wave oscillates or repeats its cycle per unit time. It 
         represents the rate of change of the phase of a sinusoidal waveform.
@@ -1119,7 +1108,6 @@ class Seasonal(BaseSynthetic):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        matrix: pd.DataFrame | np.ndarray = None,
         omega: float = 1.0,
         phi: float = 0.4,
         freq: str = 'D',
@@ -1131,50 +1119,51 @@ class Seasonal(BaseSynthetic):
             mean=mean,
             delta=delta,
             sigma=sigma,
-            matrix=matrix,
             freq=freq,
             seed=seed
         )
         self.omega = omega
         self.phi = phi
 
-    def transform(self, X: pd.DataFrame | np.ndarray | None = None):
+    def transform(self, matrix: pd.DataFrame | np.ndarray = None) -> pd.Series | pd.DataFrame:
         """
         Generate synthetic seasonal patterns data.
 
         Parameters
         ----------
-        X : pd.DataFrame | np.ndarray | None, optional
-            Custom seasonal patterns. If array-like 
-            matrix or vector, it must be of shape (length, num_paths). If None,
-            it uses `np.sin` as a default pattern. Defaults to None.
+        matrix : pd.DataFrame or np.array, optional
+            The matrix applied in Cholesky decomposition (optional).
 
         Returns
         -------
-        pd.DataFrame
-            A pandas DataFrame containing seasonal patterns.
+        pd.Series | pd.DataFrame
+            Data containing seasonal patterns.
 
         """
         # A time vector from 0 to length - 1.
         t = np.arange(self.length).reshape(-1, 1)
-        # Random amplitude values
-        amplitude = self.white_noise
         
-        if self.matrix is not None:
-            amplitude = self.cholesky_transform(amplitude, self.matrix)
-            
+        # Random amplitude values
+        amplitude = (
+            self.cholesky_transform(self.white_noise, matrix)
+            if matrix is not None
+            else self.white_noise
+        )
+       
         #  Random frequency values
         frequency = np.random.normal(
             loc=self.omega,
             scale=self.phi,
             size=(self.length, self.num_paths)
         )
-        # Random phase shifts uniformly distributed between 0 and 2π.
+        
+        # Random phase shifts uniformly distributed between 0 and 2pi.
         phase = np.random.uniform(
-            low=0, 
-            high=2*np.pi, 
+            low=0,
+            high=2*np.pi,
             size=(self.length, self.num_paths)
         )
+        
         # Generate the seasonal patterns
         paths = amplitude * np.sin(2 * np.pi * frequency * t + phase)
 

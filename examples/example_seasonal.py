@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import synthetica as sth
 
 
@@ -12,26 +13,14 @@ if __name__ == "__main__":
 # =============================================================================
     model = estimator(length=252, num_paths=1, seed=124)
     print(model)
-    # Seasonal
 
 # =============================================================================
 #     # Output
 # =============================================================================
     df = model.transform()
     print(df)
-    # 2023-09-20    0.000786
-    # 2023-09-21   -0.002465
-    # 2023-09-22   -0.008799
-    # 2023-09-23    0.005338
-    # 2023-09-24    0.003796
-      
-    # 2024-05-24    0.009035
-    # 2024-05-25   -0.013374
-    # 2024-05-26    0.004433
-    # 2024-05-27    0.002473
-    # 2024-05-28    0.001302
-    # Freq: D, Name: symbol, Length: 252, dtype: float64
-
+    # ...
+    
     df.plot()
     # --matplotlib plt--
 
@@ -88,23 +77,28 @@ if __name__ == "__main__":
 #     # Cholesky
 # =============================================================================
 
-    seed = 9
-    num_paths = 2
-
+    model = estimator(num_paths=2, seed=9)
     # Create matrix for illustration purposes
-    model = estimator(num_paths=num_paths, seed=seed)
+    matrix = np.array([[1, .8], [.8, 1]])
+    print(matrix)
+    # ...
+    
+    
+    # Without correlation
+    
     df1 = model.transform()
     print(df1)
-    df1.plot()
+    # ...
+    np.cumprod(1 + df1).plot()
     # --matplotlib plt--
-
-    # # With correlated variables
-    model = estimator(num_paths=num_paths, matrix=df1.cov(), seed=seed)
-    df2 = model.transform()
-    print(df2)
-    df2.plot()
-    # --matplotlib plt--
-
     print(df1.corr())
+    
+    
+    # With correlation
+    
+    df2 = model.transform(matrix)
+    print(df2)
+    # ...
+    np.cumprod(1 + df2).plot()
+    # --matplotlib plt--
     print(df2.corr())
-

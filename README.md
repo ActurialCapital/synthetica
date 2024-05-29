@@ -54,7 +54,7 @@ The project latest version incorporates a wide array of models, offering an exte
 * `Poisson`
 * `Seasonal`
 
-However, the `SyntheticaAdvenced` version, elevates the capabilities further, integrating more sophisticated deep learning data-driven algorithms, such as TimeGAN.
+However, the `SyntheticaAdvenced` version elevates the capabilities further, integrating more sophisticated deep learning data-driven algorithms, such as TimeGAN.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

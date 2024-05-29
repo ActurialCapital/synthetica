@@ -8,16 +8,16 @@ estimator = sth.Merton
 
 if __name__ == "__main__":
 
-# =============================================================================
-#     # Model
-# =============================================================================
+    
+    # Model
+    
     model = estimator(length=252, num_paths=1, seed=124)
     print(model)
     # GeometricBrownianMotion()
 
-# =============================================================================
-#     # Output
-# =============================================================================
+    
+    # Output
+    
     df = model.transform()
     print(df)
     # ...
@@ -25,9 +25,9 @@ if __name__ == "__main__":
     df.plot()
     # --matplotlib plt--
 
-# =============================================================================
-#     # Underlying white noise
-# =============================================================================
+    
+    # Underlying white noise
+    
     noise = model.white_noise
     print(noise)
     # ...
@@ -35,9 +35,9 @@ if __name__ == "__main__":
     pd.DataFrame(noise).plot()
     # --matplotlib plt--
 
-# =============================================================================
-#     # Testing callback
-# =============================================================================
+    
+    # Testing callback
+    
     # Mean
     # ----
     mean_value = model.mean
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     pd.DataFrame(noise).plot()
     # --matplotlib plt--
 
-# =============================================================================
-#     # Cholesky
-# =============================================================================
+    
+    # Cholesky
+    
 
     model = estimator(num_paths=2, seed=123)
     # Create matrix for illustration purposes

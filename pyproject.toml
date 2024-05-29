@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "synthetica"
+name = "python-synthetica"
 version = "0.1.0"
 description = "Generate synthetic time series data."
 authors = ["ActurialCapital"]

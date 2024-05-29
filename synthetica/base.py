@@ -20,6 +20,8 @@ class BaseSynthetic(ABC):
         The length of the time series or a pandas DatetimeIndex.
     num_paths : int, optional
         The number of paths to generate. Default is 1.
+    mean : float, optional
+        Mean (“centre”) of the distribution. Defaults to 0.
     delta : float, optional
         The time step size (e.g., 1/252 for daily data). Default is 1/252.
     sigma : float, optional
@@ -38,7 +40,6 @@ class BaseSynthetic(ABC):
         mean: float = 0,
         delta: float = 1/252,
         sigma: float = 0.125,
-        tau: float = 0.2,
         freq: str = 'D',
         seed: int = None
     ):

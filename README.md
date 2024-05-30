@@ -116,7 +116,7 @@ Generate random signals:
 
 <p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="50%" height="50%"></p>
 
-Generate correlated asset paths using the Cholesky decomposition method with the same ramdom seed:
+Generate correlated asset paths using the Cholesky decomposition method with the same random seed:
 
 ```python
 >>> df = model.transform(matrix)

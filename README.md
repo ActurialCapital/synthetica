@@ -114,7 +114,7 @@ Generate random signals:
 >>> model.transform()
 ```
 
-<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="50%" height="50%"></p>
+<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="70%" height="70%"></p>
 
 Generate correlated asset paths using the Cholesky decomposition method with the same random seed:
 
@@ -122,7 +122,7 @@ Generate correlated asset paths using the Cholesky decomposition method with the
 >>> df = model.transform(matrix)
 ```
 
-<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="50%" height="50%"></p>
+<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="70%" height="70%"></p>
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

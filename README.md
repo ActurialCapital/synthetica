@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ActurialCapital/synthetica">
-    <img src="docs/static/logo.png" alt="Logo" width="30%" height="30%">
+    <img src="docs/static/logo.png" alt="Logo">
   </a>
   <h3 align="center">Synthetica</h3>
   <p align="center">

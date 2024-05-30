@@ -1,16 +1,33 @@
 <a name="readme-top"></a>
 
 <!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/ActurialCapital/synthetica">
-    <img src="docs/static/logo.png" alt="Logo">
-  </a>
-  <h3 align="center">Synthetica</h3>
-  <p align="center">
-    Generating synthetic time series data
-  </p>
-</div>
+```
+                                                                                                                                                                                           
+                                                                                                                                                                                           
+   SSSSSSSSSSSSSSS                                               tttt         hhhhhhh                                          tttt            iiii                                        
+ SS\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:S                                           ttt\:\:\:t         h\:\:\:\:\:h                                       ttt\:\:\:t           i\:\:\:\:i                                       
+S\:\:\:\:\:SSSSSS\:\:\:\:\:\:S                                           t\:\:\:\:\:t         h\:\:\:\:\:h                                       t\:\:\:\:\:t            iiii                                        
+S\:\:\:\:\:S     SSSSSSS                                           t\:\:\:\:\:t         h\:\:\:\:\:h                                       t\:\:\:\:\:t                                                        
+S\:\:\:\:\:S      yyyyyyy           yyyyyyynnnn  nnnnnnnn    ttttttt\:\:\:\:\:ttttttt    h\:\:\:\:h hhhhh           eeeeeeeeeeee    ttttttt\:\:\:\:\:ttttttt    iiiiiii     cccccccccccccccc  aaaaaaaaaaaaa   
+S\:\:\:\:\:S       y\:\:\:\:\:y         y\:\:\:\:\:y n\:\:\:nn\:\:\:\:\:\:\:\:nn  t\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:t    h\:\:\:\:hh\:\:\:\:\:hhh      ee\:\:\:\:\:\:\:\:\:\:\:\:ee  t\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:t    i\:\:\:\:\:i   cc\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:c  a\:\:\:\:\:\:\:\:\:\:\:\:a  
+ S\:\:\:\:SSSS     y\:\:\:\:\:y       y\:\:\:\:\:y  n\:\:\:\:\:\:\:\:\:\:\:\:\:\:nn t\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:t    h\:\:\:\:\:\:\:\:\:\:\:\:\:\:hh   e\:\:\:\:\:\:eeeee\:\:\:\:\:eet\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:t     i\:\:\:\:i  c\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:c  aaaaaaaaa\:\:\:\:\:a 
+  SS\:\:\:\:\:\:SSSSS y\:\:\:\:\:y     y\:\:\:\:\:y   nn\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:ntttttt\:\:\:\:\:\:\:tttttt    h\:\:\:\:\:\:\:hhh\:\:\:\:\:\:h e\:\:\:\:\:\:e     e\:\:\:\:\:etttttt\:\:\:\:\:\:\:tttttt     i\:\:\:\:i c\:\:\:\:\:\:\:cccccc\:\:\:\:\:c           a\:\:\:\:a 
+    SSS\:\:\:\:\:\:\:\:SSy\:\:\:\:\:y   y\:\:\:\:\:y      n\:\:\:\:\:nnnn\:\:\:\:\:n      t\:\:\:\:\:t          h\:\:\:\:\:\:h   h\:\:\:\:\:\:he\:\:\:\:\:\:\:eeeee\:\:\:\:\:\:e      t\:\:\:\:\:t           i\:\:\:\:i c\:\:\:\:\:\:c     ccccccc    aaaaaaa\:\:\:\:\:a 
+       SSSSSS\:\:\:\:Sy\:\:\:\:\:y y\:\:\:\:\:y       n\:\:\:\:n    n\:\:\:\:n      t\:\:\:\:\:t          h\:\:\:\:\:h     h\:\:\:\:\:he\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:e       t\:\:\:\:\:t           i\:\:\:\:i c\:\:\:\:\:c               aa\:\:\:\:\:\:\:\:\:\:\:\:a 
+            S\:\:\:\:\:Sy\:\:\:\:\:y\:\:\:\:\:y        n\:\:\:\:n    n\:\:\:\:n      t\:\:\:\:\:t          h\:\:\:\:\:h     h\:\:\:\:\:he\:\:\:\:\:\:eeeeeeeeeee        t\:\:\:\:\:t           i\:\:\:\:i c\:\:\:\:\:c              a\:\:\:\:aaaa\:\:\:\:\:\:a 
+            S\:\:\:\:\:S y\:\:\:\:\:\:\:\:\:y         n\:\:\:\:n    n\:\:\:\:n      t\:\:\:\:\:t    tttttth\:\:\:\:\:h     h\:\:\:\:\:he\:\:\:\:\:\:\:e                 t\:\:\:\:\:t    tttttt i\:\:\:\:i c\:\:\:\:\:\:c     ccccccca\:\:\:\:a    a\:\:\:\:\:a 
+SSSSSSS     S\:\:\:\:\:S  y\:\:\:\:\:\:\:y          n\:\:\:\:n    n\:\:\:\:n      t\:\:\:\:\:\:tttt\:\:\:\:\:th\:\:\:\:\:h     h\:\:\:\:\:he\:\:\:\:\:\:\:\:e                t\:\:\:\:\:\:tttt\:\:\:\:\:ti\:\:\:\:\:\:ic\:\:\:\:\:\:\:cccccc\:\:\:\:\:ca\:\:\:\:a    a\:\:\:\:\:a 
+S\:\:\:\:\:\:SSSSSS\:\:\:\:\:S   y\:\:\:\:\:y           n\:\:\:\:n    n\:\:\:\:n      tt\:\:\:\:\:\:\:\:\:\:\:\:\:\:th\:\:\:\:\:h     h\:\:\:\:\:h e\:\:\:\:\:\:\:\:eeeeeeee        tt\:\:\:\:\:\:\:\:\:\:\:\:\:\:ti\:\:\:\:\:\:i c\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:ca\:\:\:\:\:aaaa\:\:\:\:\:\:a 
+S\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:SS   y\:\:\:\:\:y            n\:\:\:\:n    n\:\:\:\:n        tt\:\:\:\:\:\:\:\:\:\:\:tth\:\:\:\:\:h     h\:\:\:\:\:h  ee\:\:\:\:\:\:\:\:\:\:\:\:\:e          tt\:\:\:\:\:\:\:\:\:\:\:tti\:\:\:\:\:\:i  cc\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:c a\:\:\:\:\:\:\:\:\:\:aa\:\:\:a
+ SSSSSSSSSSSSSSS    y\:\:\:\:\:y             nnnnnn    nnnnnn          ttttttttttt  hhhhhhh     hhhhhhh    eeeeeeeeeeeeee            ttttttttttt  iiiiiiii    cccccccccccccccc  aaaaaaaaaa  aaaa
+                   y\:\:\:\:\:y                                                                                                                                                                 
+                  y\:\:\:\:\:y                                                                                                                                                                  
+                 y\:\:\:\:\:y                                                                                                                                                                   
+                y\:\:\:\:\:y                                                                                                                                                                    
+               yyyyyyy                                                                                                                                                                     
+                                                                                                                                                                                           
+
+```
 
 <!-- TABLE OF CONTENTS -->
 <details>

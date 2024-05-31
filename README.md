@@ -83,37 +83,29 @@ In this example, we are using the following parameters for illustration purposes
 * `num_paths=2`: The number of paths to generate
 * `seed=123`: Reseed the `numpy` singleton `RandomState` instance for reproduction
 
-Additionally, we'll create a correlation matrix to establish a basket of correlated asset paths using the Cholesky decomposition method:
-
-```python
->>> matrix = np.array([[1, 0.8, 0.6, 0.4, 0.2],
-                       [0.8, 1, 0.8, 0.6, 0.4],
-                       [0.6, 0.8, 1, 0.8, 0.6],
-                       [0.4, 0.6, 0.8, 1, 0.8],
-                       [0.2, 0.4, 0.6, 0.8, 1]])
-```
-
-Using the `GeometricBrownianMotion` model:
+**Initialize the model**: Using the `GeometricBrownianMotion` (GBM) model: This approach initializes the model with a specified path length, number of paths, and a fixed random seed:
 
 ```python
 >>> model = sth.GeometricBrownianMotion(length=252, num_paths=2, seed=123)
 ```
 
-Generate random signals:
+**Generate random signals**: The transform method then generates the random signals accordingly:
 
 ```python
->>> model.transform()
+>>> model.transform() # Generate random signals
 ```
 
-<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="70%" height="70%"></p>
+<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="50%" height="50%"></p>
 
-Generate correlated asset paths using the Cholesky decomposition method with the same random seed:
+**Generate correlated paths**: This process ensures that the resulting features are highly positively correlated, leveraging the Cholesky decomposition method to achieve the desired `matrix` correlation structure:
 
 ```python
->>> df = model.transform(matrix)
+>>> df = model.transform(matrix) # Produces highly positively correlated features
 ```
 
-<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="70%" height="70%"></p>
+
+
+<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="50%" height="50%"></p>
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

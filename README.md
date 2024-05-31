@@ -80,7 +80,7 @@ Once you have cloned the repository, you can start using `Synthetica` to generat
 In this example, we are using the following parameters for illustration purposes:
 
 * `length=252`: The length of the time series
-* `num_paths=2`: The number of paths to generate
+* `num_paths=5`: The number of paths to generate
 * `seed=123`: Reseed the `numpy` singleton `RandomState` instance for reproduction
 
 **Initialize the model**: Using the `GeometricBrownianMotion` (GBM) model: This approach initializes the model with a specified path length, number of paths, and a fixed random seed:

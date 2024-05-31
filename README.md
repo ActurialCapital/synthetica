@@ -35,8 +35,8 @@
 The project latest version incorporates a wide array of models, offering an extensive toolkit for generating synthetic time series data. This version includes features like:
 
 * `GeometricBrownianMotion`
-* `AR` (Autoregressive)
-* `NARMA` (Non-Linear Autoregressive Moving Average)
+* `AR` (Auto Regressive)
+* `NARMA` (Non-Linear Auto Regressive Moving Average)
 * `Heston`
 * `CIR`
 * `LevyStable`

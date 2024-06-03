@@ -86,7 +86,7 @@ In this example, we are using the following parameters for illustration purposes
 **Initialize the model**: Using the `GeometricBrownianMotion` (GBM) model: This approach initializes the model with a specified path length, number of paths, and a fixed random seed:
 
 ```python
->>> model = sth.GeometricBrownianMotion(length=252, num_paths=2, seed=123)
+>>> model = sth.GeometricBrownianMotion(length=252, num_paths=5, seed=123)
 ```
 
 **Generate random signals**: The transform method then generates the random signals accordingly:

@@ -38,9 +38,9 @@ The project latest version incorporates a wide array of models, offering an exte
 * `AR` (Auto Regressive)
 * `NARMA` (Non-Linear Auto Regressive Moving Average)
 * `Heston`
-* `CIR`
+* `CIR` (Cox–Ingersoll–Ross)
 * `LevyStable`
-* `MeanReverting`
+* `MeanReverting` (Ornstein–Uhlenbeck)
 * `Merton`
 * `Poisson`
 * `Seasonal`

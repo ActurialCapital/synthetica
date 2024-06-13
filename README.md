@@ -45,7 +45,7 @@ The project latest version incorporates a wide array of models, offering an exte
 * `Poisson`
 * `Seasonal`
 
-However, the `SyntheticaAdvenced` version elevates the capabilities further, integrating more sophisticated deep learning data-driven algorithms, such as TimeGAN.
+However, the `SyntheticaAdvenced` version elevates the capabilities further, integrating more sophisticated deep learning data-driven algorithms, such as `TimeGAN`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -95,17 +95,17 @@ In this example, we are using the following parameters for illustration purposes
 >>> model.transform() # Generate random signals
 ```
 
-<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="50%" height="50%"></p>
+<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="75%" height="75%"></p>
 
 **Generate correlated paths**: This process ensures that the resulting features are highly positively correlated, leveraging the Cholesky decomposition method to achieve the desired `matrix` correlation structure:
 
 ```python
->>> df = model.transform(matrix) # Produces highly positively correlated features
+>>> model.transform(matrix) # Produces highly positively correlated features
 ```
 
 
 
-<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="50%" height="50%"></p>
+<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="75%" height="75%"></p>
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

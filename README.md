@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <!-- PROJECT LOGO -->
-# Synthetica
+<p align="center"><img src="docs/static/logo.png" alt="logo" width="90%" height="90%"></p>
 
 <!-- TABLE OF CONTENTS -->
 <details>

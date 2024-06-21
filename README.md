@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <!-- PROJECT LOGO -->
-<p align="center"><img src="docs/static/logo.png" alt="logo" width="90%" height="90%"></p>
+<p align="center"><img src="https://github.com/ActurialCapital/synthetica/blob/main/docs/static/logo.png" alt="logo" width="90%" height="90%"></p>
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -93,7 +93,7 @@ In this example, we are using the following parameters for illustration purposes
 >>> model.transform() # Generate random signals
 ```
 
-<p align="center"><img src="docs/static/gbm_random_transform.png" alt="chart-1" width="75%" height="75%"></p>
+<p align="center"><img src="https://github.com/ActurialCapital/synthetica/blob/main/docs/static/gbm_random_transform.png" alt="chart-1" width="75%" height="75%"></p>
 
 **Generate correlated paths**: This process ensures that the resulting features are highly positively correlated, leveraging the Cholesky decomposition method to achieve the desired `matrix` correlation structure:
 
@@ -103,7 +103,7 @@ In this example, we are using the following parameters for illustration purposes
 
 
 
-<p align="center"><img src="docs/static/gbm_corr_transform.png" alt="chart-2"  width="75%" height="75%"></p>
+<p align="center"><img src="https://github.com/ActurialCapital/synthetica/blob/main/docs/static/gbm_corr_transform.png" alt="chart-2"  width="75%" height="75%"></p>
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

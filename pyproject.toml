@@ -5,6 +5,8 @@ description = "Generate synthetic time series data."
 authors = ["ActurialCapital"]
 license = "BSD 3-Clause License"
 readme = "README.md"
+repository = "https://github.com/ActurialCapital/synthetica"
+packages = [ {include = "synthetica"} ]
 
 [tool.poetry.dependencies]
 python = "^3.11"

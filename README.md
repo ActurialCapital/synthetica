@@ -60,10 +60,8 @@ However, the `SyntheticaAdvenced` version elevates the capabilities further, int
 <!-- GETTING STARTED -->
 ## Installation
 
-To get started with `Synthetica`, you can clone the repository to your local machine. Ensure you have Git installed, then run the following command:
-
 ```sh
-$ git clone https://github.com/ActurialCapital/synthetica.git
+$ pip install python-synthetica
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

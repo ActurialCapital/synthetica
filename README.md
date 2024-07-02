@@ -3,6 +3,14 @@
 <!-- PROJECT LOGO -->
 <p align="center"><img src="https://github.com/ActurialCapital/synthetica/blob/main/docs/static/logo.png" alt="logo" width="90%" height="90%"></p>
 
+| Overview | |
+|---|---|
+| **Open Source** |  [![BSD 3-clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/ActurialCapital/synthetica/blob/main/LICENSE) |
+| **Code** |  [![!pypi](https://img.shields.io/pypi/v/python-synthetica?color=orange)](https://pypi.org/project/python-synthetica/) [![!python-versions](https://img.shields.io/pypi/pyversions/python-synthetica)](https://www.python.org/) |
+| **CI/CD** | [![!codecov](https://img.shields.io/codecov/c/github/ActurialCapital/synthetica?label=codecov&logo=codecov)](https://codecov.io/gh/ActurialCapital/synthetica) |
+| **Downloads** | ![PyPI - Downloads](https://img.shields.io/pypi/dw/python-synthetica) ![PyPI - Downloads](https://img.shields.io/pypi/dm/python-synthetica) [![Downloads](https://static.pepy.tech/personalized-badge/python-synthetica?period=total&units=international_system&left_color=grey&right_color=blue&left_text=cumulative%20(pypi))](https://pepy.tech/project/python-synthetica) |
+
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>

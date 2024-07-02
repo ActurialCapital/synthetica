@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-synthetica"
-version = "0.1.0"
+version = "0.1.2"
 description = "Generate synthetic time series data."
 authors = ["ActurialCapital"]
 license = "BSD 3-Clause License"

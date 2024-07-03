@@ -872,7 +872,7 @@ class MeanReverting(BaseSynthetic):
         return self.to_pandas(paths[1:,])
 
 
-class AR(BaseSynthetic):
+class AutoRegressive(BaseSynthetic):
     """
     A class for generating synthetic autoregressive (AR) model.
 

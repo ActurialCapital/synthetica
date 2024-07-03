@@ -43,12 +43,12 @@
 The project latest version incorporates a wide array of models, offering an extensive toolkit for generating synthetic time series data. This version includes features like:
 
 * `GeometricBrownianMotion`
-* `AR` (Auto Regressive)
-* `NARMA` (Non-Linear Auto Regressive Moving Average)
+* `AutoRegressive`
+* `NARMA`
 * `Heston`
-* `CIR` (Cox–Ingersoll–Ross)
+* `CIR`
 * `LevyStable`
-* `MeanReverting` (Ornstein–Uhlenbeck)
+* `MeanReverting`
 * `Merton`
 * `Poisson`
 * `Seasonal`
@@ -109,12 +109,41 @@ In this example, we are using the following parameters for illustration purposes
 >>> model.transform(matrix) # Produces highly positively correlated features
 ```
 
-
-
 <p align="center"><img src="https://github.com/ActurialCapital/synthetica/blob/main/docs/static/gbm_corr_transform.png" alt="chart-2"  width="75%" height="75%"></p>
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Positive Definiteness
+
+### What positive definite means in a covariance matrix
+
+A covariance matrix is considered positive definite if it satisfies the following key properties:
+
+1. It is symmetric, meaning the matrix is equal to its transpose.
+2. For any non-zero vector $x$, $x^T * C * x > 0$, where $C$ is the covariance matrix and $x^T$ is the transpose of $x$.
+3. All of its eigenvalues are strictly positive.
+
+Positive definiteness in a covariance matrix has important implications:
+
+1. It ensures the matrix is invertible, which is crucial for many [statistical techniques](https://stats.stackexchange.com/questions/52976/is-a-sample-covariance-matrix-always-symmetric-and-positive-definite).
+2. It guarantees that the matrix represents a [valid probability distribution](https://statproofbook.github.io/P/covmat-psd.html).
+3. It allows for unique solutions in [optimization problems](https://gowrishankar.info/blog/why-covariance-matrix-should-be-positive-semi-definite-tests-using-breast-cancer-dataset/) and ensures the stability of certain algorithms.
+4. It indicates that no linear combination of the variables has zero variance, meaning all variables contribute [meaningful information](https://math.stackexchange.com/questions/114072/what-is-the-proof-that-covariance-matrices-are-always-semi-definite).
+
+A covariance matrix that is positive semi-definite (allowing for eigenvalues to be non-negative rather than strictly positive) is still valid, but may indicate linear dependencies among variables.
+
+In practice, sample covariance matrices are often positive definite if the number of observations exceeds the number of variables and there are no perfect linear relationships among the variables.
+
+### Implementation
+
+`synthetica` automatically finds the nearest positive-definite matrix to input using `nearest_positive_definite` python function. it is directly sourced from [Computing a nearest symmetric positive semidefinite matrix](https://doi.org/10.1016/0024-3795(88)90223-6).
+
+### Other Sources
+
+* [Matlab code](https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd)
+* [Stackoverflow](https://stackoverflow.com/.../python-convert-matrix-to-positive-semi-definite)
+* [Gist](https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd)
 
 <!-- CONTRIBUTING -->
 ## Contributing

@@ -227,7 +227,8 @@ class BaseSynthetic(ABC):
 
         return self.to_pandas(np.array(extracted_paths).T)
 
-    def cholesky_transform(self, rvs: np.array, matrix: np.array) -> np.ndarray:
+    @staticmethod
+    def cholesky_transform(rvs: np.array, matrix: np.array) -> np.ndarray:
         """
         Perform Cholesky transformation on random variables.
 

@@ -13,12 +13,15 @@ simulators = [
     sth.Poisson,
     sth.LevyStable,
     sth.CIR,
-    sth.MeanReverting
+    sth.MeanReverting,
+    sth.AutoRegressive,
+    sth.NARMA,
+    sth.Seasonal
 ]
 
 
 @pytest.fixture(params=simulators, ids=[sim.__name__ for sim in simulators])
-def simulator_data(request):
+def simulator_data(request: pytest.FixtureRequest):
     """
     Pytest fixture to generate synthetic data for each simulator.
 
@@ -37,7 +40,7 @@ def simulator_data(request):
     yield sim_class, data
 
 
-def test_gbm(simulator_data):
+def test_gbm(simulator_data: tuple):
     """
     Test for the Geometric Brownian Motion (GBM) simulator.
 
@@ -57,11 +60,10 @@ def test_gbm(simulator_data):
     # Shapiro-Wilk test for normality
     _, pvalue = stats.shapiro(log_returns)
     # Assuming a significance level of 5%
-    assert pvalue > 0.05, \
-        "Log returns not normally distributed"
+    assert pvalue > 0.05, "Log returns not normally distributed"
 
 
-def test_heston(simulator_data):
+def test_heston(simulator_data: tuple):
     """
     Test for the Heston model simulator.
 
@@ -91,7 +93,7 @@ def test_heston(simulator_data):
     ), "Volatility clustering not detected"
 
 
-def test_merton(simulator_data):
+def test_merton(simulator_data: tuple):
     """
     Test for the Merton model simulator.
 
@@ -113,11 +115,10 @@ def test_merton(simulator_data):
     log_returns = np.log(data / data.shift(1)).dropna()
     z_scores = np.abs(stats.zscore(log_returns))
     # Check for values more than 3 standard deviations from the mean
-    assert np.any(z_scores > 3), \
-        "Jumps not properly detected"
+    assert np.any(z_scores > 3), "Jumps not properly detected"
 
 
-def test_poisson(simulator_data):
+def test_poisson(simulator_data: tuple):
     """
     Test for the Poisson simulator.
 
@@ -140,11 +141,13 @@ def test_poisson(simulator_data):
     z_scores = np.abs(stats.zscore(log_returns))
     jump_count = np.sum(z_scores > 3)
     # Expect at least some jumps
-    assert jump_count.sum() > 0, \
-        "Jump characteristics not as expected"
+    assert jump_count.sum() > 0, "Jump characteristics not as expected"
+    expected_lambda = 2 * (1 / 252)
+    assert sim_class().lambda_poisson == expected_lambda, \
+        f"Expected lambda_poisson to be {expected_lambda}"
 
 
-def test_mean_reverting(simulator_data):
+def test_mean_reverting(simulator_data: tuple):
     """
     Test for the Mean Reverting models, specifically the CIR and MeanReverting 
     simulators.
@@ -171,20 +174,15 @@ def test_mean_reverting(simulator_data):
     # Perform the Augmented Dickey-Fuller test on each column
     p_values = [adfuller(data[col].dropna())[1] for col in data.columns]
     # Return True if all columns have p-value < 0.05 (indicating mean reversion)
-    assert all(p < 0.05 for p in p_values), \
-        "No mean reversion detected"
+    assert all(p < 0.05 for p in p_values), "No mean reversion detected"
 
 
 # Common checks for all simulators
 # Iterate over each simulator class
-@pytest.mark.parametrize(
-    "length, num_paths", [
-        (length, num_paths)
-        for num_paths in range(10, 0, -1)
-        for length in range(10, 100, 10)
-    ]
-)
-def test_common_checks(simulator_data, length, num_paths):
+@pytest.mark.parametrize("length, num_paths", [
+    (length, num_paths) for num_paths in range(10, 0, -1) for length in range(10, 100, 10)
+])
+def test_common_checks(simulator_data: tuple, length: int, num_paths: int):
     """
     Test common checks across all simulators.
 
@@ -220,5 +218,54 @@ def test_common_checks(simulator_data, length, num_paths):
         isinstance(value, (int, float, complex)
                    ) and not isinstance(value, bool)
         for value in pd.DataFrame(data).values.flatten()
-    ), \
-        "Contains non-numeric values."
+    ), "Contains non-numeric values."
+
+
+
+    # Generate random variables
+    rvs = np.random.randn(100, 3)  # 100 samples, 3 variables
+    
+    
+    # Test cholesky transform positive definite
+
+    # Create a positive definite matrix
+    A = np.array([[2, 0.5, 0.3], [0.5, 1, 0.4], [0.3, 0.4, 1]])
+    # Perform the Cholesky transform
+    transformed_rvs = sim_class.cholesky_transform(rvs, A)
+    # Check the shape of the transformed variables
+    assert transformed_rvs.shape == rvs.shape, \
+        "Expected the shape of transformed variables to match the input"
+    # Check that the transformed variables are not equal to the original ones
+    assert not np.allclose(transformed_rvs, rvs), \
+        "Expected transformed variables to differ from the original ones"
+
+    
+    # Test cholesky transform non positive definite
+
+    # Create a non-positive definite matrix
+    A = np.array([[1, 2, 3], [2, 1, 2], [3, 2, 1]])
+    # Perform the Cholesky transform
+    transformed_rvs = sim_class.cholesky_transform(rvs, A)
+
+    # Check the shape of the transformed variables
+    assert transformed_rvs.shape == rvs.shape, \
+        "Expected the shape of transformed variables to match the input"
+
+    # Check that the transformed variables are not equal to the original ones
+    assert not np.allclose(transformed_rvs, rvs), \
+        "Expected transformed variables to differ from the original ones"
+
+
+    # Test cholesky transform identity matrix
+    
+    # Create an identity matrix
+    A = np.eye(3)
+    # Perform the Cholesky transform
+    transformed_rvs = sim_class.cholesky_transform(rvs, A)
+    # Check the shape of the transformed variables
+    assert transformed_rvs.shape == rvs.shape, \
+        "Expected the shape of transformed variables to match the input"
+    # Check that the transformed variables are equal to the original ones
+    assert np.allclose(transformed_rvs, rvs), \
+        "Expected transformed variables to be the same as the original ones"
+

@@ -141,8 +141,8 @@ In practice, sample covariance matrices are often positive definite if the numbe
 
 ### Other Sources
 
-* [Matlab code](https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd)
-* [Stackoverflow](https://stackoverflow.com/.../python-convert-matrix-to-positive-semi-definite)
+* [MatLab](https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd)
+* [StackOverflow](https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite)
 * [Gist](https://gist.github.com/fasiha/fdb5cec2054e6f1c6ae35476045a0bbd)
 
 <!-- CONTRIBUTING -->

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable
+from typing import Iterable, Optional
 from functools import cached_property
 import numpy as np
 import pandas as pd
@@ -35,21 +35,20 @@ class BaseSynthetic(ABC):
 
     def __init__(
         self,
-        length: int | pd.DatetimeIndex = 252,
-        num_paths: int = 1,
-        mean: float = 0,
-        delta: float = 1/252,
-        sigma: float = 0.125,
-        freq: str = 'D',
-        seed: int = None
+        length: Optional[int | pd.DatetimeIndex] = 252,
+        num_paths: Optional[int] = 1,
+        mean: Optional[float] = 0,
+        delta: Optional[float] = 1/252,
+        sigma: Optional[float] = 0.125,
+        freq: Optional[str] = 'D',
+        seed: Optional[int] = None
     ):
         # Generic
         self._length = length
         self._freq = freq
         self._num_paths = num_paths
-        if seed is not None:
-            np.random.seed(seed)
-            
+        self._seed = seed
+
         # White noise params
         self._mean = mean
         self._delta = delta
@@ -107,13 +106,27 @@ class BaseSynthetic(ABC):
         )
 
     @property
+    def seed(self) -> int:
+        if self._seed is not None:
+            np.random.seed(self._seed)
+        return self._seed
+
+    @seed.setter
+    @sth.callback('white_noise')
+    def seed(self, value: int) -> float:
+        """Random seed value update"""
+        self._seed = value
+        if self._seed is not None:
+            np.random.seed(self._seed)
+
+    @property
     def mean(self) -> float:
         """Mean value"""
         return self._mean
 
     @mean.setter
     @sth.callback('white_noise')
-    def mean(self, value) -> float:
+    def mean(self, value: float) -> float:
         """Mean value update"""
         if value != self._mean:
             self._mean = value
@@ -125,7 +138,7 @@ class BaseSynthetic(ABC):
 
     @delta.setter
     @sth.callback('white_noise')
-    def delta(self, value) -> float:
+    def delta(self, value: float) -> float:
         """Delta value update"""
         if value != self._delta:
             self._delta = value
@@ -137,7 +150,7 @@ class BaseSynthetic(ABC):
 
     @sigma.setter
     @sth.callback('white_noise')
-    def sigma(self, value) -> float:
+    def sigma(self, value: float) -> float:
         """Sigma value update"""
         if value != self._sigma:
             self._sigma = value
@@ -184,49 +197,6 @@ class BaseSynthetic(ABC):
 
     # #### Cholesky #### #
 
-    def create_corr_returns(self, matrix) -> pd.Series | pd.DataFrame:
-        """
-        This method can construct a basket of correlated asset paths using the 
-        Cholesky decomposition method.
-
-        Parameters
-        ----------
-        matrix : pd.DataFrame or np.array
-            The matrix applied in Cholesky decomposition.
-
-        Returns
-        -------
-        pd.Series or pd.DataFrame:
-            Data representing correlated log returns.
-        """
-        try:
-            decomposition = np.linalg.cholesky(matrix)
-
-        except:
-            updated_matrix = sth.nearest_positive_definite(matrix)
-            decomposition = np.linalg.cholesky(updated_matrix)
-
-        sqrt_delta_sigma = np.sqrt(self.delta) * self.sigma
-
-        # Construct uncorrelated paths to convert into correlated paths
-        uncorrelated_paths = [
-            np.array(
-                # Uncorrelated random numbers
-                [np.random.normal(0, sqrt_delta_sigma)
-                 for _ in range(self.num_paths)]
-            )
-            for _ in range(self.length + 1)
-        ]
-
-        uncorrelated_matrix = np.matrix(uncorrelated_paths)
-        correlated_matrix = uncorrelated_matrix * decomposition
-        extracted_paths = [[] for _ in range(1, self.num_paths + 1)]
-        for j in range(0, len(correlated_matrix) * self.num_paths - self.num_paths, self.num_paths):
-            for i in range(self.num_paths):
-                extracted_paths[i].append(correlated_matrix.item(j + i))
-
-        return self.to_pandas(np.array(extracted_paths).T)
-
     @staticmethod
     def cholesky_transform(rvs: np.array, matrix: np.array) -> np.ndarray:
         """
@@ -248,12 +218,46 @@ class BaseSynthetic(ABC):
             decomposition = np.linalg.cholesky(matrix)
 
         except:
-            # raise Warning('Covariance is not positive definite.')
-            positive_definite_matrix = sth.nearest_positive_definite(matrix)
-            decomposition = np.linalg.cholesky(positive_definite_matrix)
+            updated_matrix = sth.nearest_positive_definite(matrix)
+            decomposition = np.linalg.cholesky(updated_matrix)
 
         # return (decomposition @ rvs.T).T
         return np.matmul(decomposition, rvs.T).T
+
+    def create_corr_returns(self, matrix: np.ndarray | pd.DataFrame) -> pd.Series | pd.DataFrame:
+        """
+        This method can construct a basket of correlated asset paths using the 
+        Cholesky decomposition method.
+
+        Parameters
+        ----------
+        matrix : pd.DataFrame or np.array
+            The matrix applied in Cholesky decomposition.
+
+        Returns
+        -------
+        pd.Series or pd.DataFrame:
+            Data representing correlated log returns.
+        """
+        self.seed  # Regenerate seed
+
+        # Construct uncorrelated paths to convert into correlated paths
+        rvs = np.random.normal(
+            loc=0,
+            scale=np.sqrt(self.delta) * self.sigma,
+            size=(self.length + 1, self.num_paths)
+        )
+        rvs_matrix = np.matrix(rvs)
+
+        correlated_matrix = self.cholesky_transform(rvs_matrix, matrix)
+
+        extracted_paths = [[] for _ in range(1, self.num_paths + 1)]
+        for j in range(0, len(correlated_matrix) * self.num_paths - self.num_paths, self.num_paths):
+            for i in range(self.num_paths):
+                extracted_paths[i].append(correlated_matrix.item(j + i))
+
+        output = np.array(extracted_paths).T
+        return self.to_pandas(output)
 
     # #### Converter #### #
 
@@ -277,7 +281,7 @@ class BaseSynthetic(ABC):
     def to_prices(
         self,
         log_returns: Iterable,
-        start_value: float = 100.0
+        start_value: Optional[float] = 100.0
     ) -> np.ndarray:
         """
        This method converts a sequence of log returns into normal returns 
@@ -303,7 +307,7 @@ class BaseSynthetic(ABC):
         # A sequence of prices starting with start_value
         return returns * start_value
 
-    def to_pandas(self, output) -> pd.Series | pd.DataFrame:
+    def to_pandas(self, output: np.ndarray) -> pd.Series | pd.DataFrame:
         """
         Convert synthetic output to a pandas DataFrame or Series.
 

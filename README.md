@@ -26,6 +26,7 @@
     </li>
     <li><a href="#installation">Installation</a></li>
     <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#notes">Notes</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
   </ol>
@@ -114,9 +115,31 @@ In this example, we are using the following parameters for illustration purposes
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Positive Definiteness
+## Notes
 
-### What positive definite means in a covariance matrix
+### Cholesky Decomposition
+
+The Cholesky transformation (or Cholesky decomposition) is a mathematical technique used to decompose a positive definite matrix into the product of a lower triangular matrix and its transpose. This is particularly useful in various fields such as numerical analysis, optimization, and financial modeling:
+
+1. **Numerical Stability**: The Cholesky decomposition is more numerically stable than other decomposition methods for positive definite matrices.
+2. **Solving Linear Systems**: It is used to solve linear systems of equations efficiently.
+3. **Simulating Correlated Random Variables**: In finance and statistics, it is used to generate correlated random variables from uncorrelated ones.
+
+#### Mathematical Definition
+
+Given a positive definite matrix $A$, the Cholesky decomposition is a factorization such that $A = L L^T$, where:
+- $A$ is a positive definite matrix.
+- $L$ is a lower triangular matrix.
+- $L^T$ is the transpose of $L$.
+
+
+#### Implementation
+
+In the context of synthetic data generation, the Cholesky transformation can be used to apply a correlation structure to a set of uncorrelated random variables. `synthetica` uses `np.linalg.cholesky` in the background
+
+### Positive Definiteness
+
+#### What positive definite means in a covariance matrix
 
 A covariance matrix is considered positive definite if it satisfies the following key properties:
 
@@ -135,11 +158,11 @@ A covariance matrix that is positive semi-definite (allowing for eigenvalues to 
 
 In practice, sample covariance matrices are often positive definite if the number of observations exceeds the number of variables and there are no perfect linear relationships among the variables.
 
-### Implementation
+#### Implementation
 
 `synthetica` automatically finds the nearest positive-definite matrix to input using `nearest_positive_definite` python function. it is directly sourced from [Computing a nearest symmetric positive semidefinite matrix](https://doi.org/10.1016/0024-3795(88)90223-6).
 
-### Other Sources
+#### Other Sources
 
 * [MatLab](https://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd)
 * [StackOverflow](https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite)
